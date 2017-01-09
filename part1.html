@@ -23,10 +23,12 @@ function preload() {
 	game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
 }
 
+var score = 0;
+var scoreText;
+
 function create() {
 	game.physics.startSystem(Phaser.Physics.ARCADE);
 	game.add.sprite(0,0,'sky');
-	game.add.sprite(0,0,'star');
 	platform = game.add.group();
 	platform.enableBody = true;
 	var ground = platform.create(0, game.world.height - 64, 'ground');
@@ -43,11 +45,26 @@ function create() {
 	player.body.collideWorldBounds = true;
 	player.animations.add('left', [0, 1, 2, 3], 10, true);
   player.animations.add('right', [5, 6, 7, 8], 10, true);
+
+	stars = game.add.group();
+	stars.enableBody = true;
+	for(i=0; i<12; i++){
+var star = stars.create(i * 70, 0 , 'star');
+star.body.gravity.y = 6;
+star.body.bounce.y = 0.7 + Math.random() * 0.2;
+}
+
+scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+
+
+
 }
 
 function update() {
 	var hitPlatform = game.physics.arcade.collide(player, platform);
 	cursors = game.input.keyboard.createCursorKeys();
+	game.physics.arcade.collide(stars, platform);
+	game.physics.arcade.overlap(player, stars, collectStar, null, this);
 
 	player.body.velocity.x = 0;
 
@@ -77,6 +94,11 @@ function update() {
 	 {
 			 player.body.velocity.y = -350;
 	 }
+}
+function collectStar (player, star) {
+    star.kill();
+		score += 10;
+    scoreText.text = 'Score: ' + score;
 }
 
 </script>
